@@ -1,0 +1,73 @@
+DROP TABLE IF EXISTS RESERVATIONS;
+CREATE TABLE RESERVATIONS(
+	id_reservation int NOT NULL,
+	id_customer int NOT NULL,
+	id_visitor int,
+	date date NOT NULL,
+	from_date date NOT NULL,
+	to_date date NOT NULL,
+	status_cost bool NOT NULL,
+	date_cost date,
+	id_room int NOT NULL, 
+	PRIMARY KEY(id_reservation, id_customer, id_room),
+	FOREIGN KEY(id_customer) REFERENCES CUSTOMERS (id_customer),
+	FOREIGN KEY(id_room) REFERENCES ROOMS (id_room),	
+	FOREIGN KEY(id_visitor) REFERENCES VISITORS (id_visitor),
+	FOREIGN KEY (id_reservation, id_customer) REFERENCES ROOM_RESERVATIONS(id_reservation, id_customer)
+);
+
+DROP TABLE IF EXISTS CUSTOMERS;
+CREATE TABLE CUSTOMERS(
+	id_customer int NOT NULL,
+	title text NOT NULL,
+	fullname text NOT NULL,	
+	age int NOT NULL,
+	address text NOT NULL,
+	postal_code int NOT NULL,
+	city text NOT NULL,
+	country text NOT NULL,
+	phone_number text NOT NULL,
+	email text NOT NULL,
+	credit_card text NOT NULL,
+	PRIMARY KEY(id_customer)	
+);
+
+DROP TABLE IF EXISTS VISITORS;
+CREATE TABLE VISITORS(
+	id_visitor int NOT NULL,
+	title text NOT NULL,
+	fullname text NOT NULL,	
+	age int NOT NULL,
+	address text NOT NULL,
+	postal_code int NOT NULL,
+	city text NOT NULL,
+	country text NOT NULL,
+	phone_number text NOT NULL,
+	email text NOT NULL,
+	credit_card text NOT NULL,
+	PRIMARY KEY(id_visitor)	
+);
+
+DROP TABLE IF EXISTS ROOMS;
+CREATE TABLE ROOMS(
+	id_room int NOT NULL,
+	type text NOT NULL,
+	price_range text NOT NULL,
+	tv bool NOT NULL,
+	air_condition bool NOT NULL,
+	room_service bool NOT NULL,
+	season text NOT NULL,
+	room_cost float NOT NULL,
+	PRIMARY KEY(id_room)	
+);
+
+DROP TABLE IF EXISTS ROOM_RESERVATIONS;
+CREATE TABLE ROOM_RESERVATIONS(
+	id_reservation int NOT NULL,
+	id_customer int NOT NULL,
+	credit_card text NOT NULL,
+	total_cost float NOT NULL,
+	PRIMARY KEY(id_reservation, id_customer)	
+);
+
+

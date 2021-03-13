@@ -1,0 +1,25 @@
+CREATE OR REPLACE FUNCTION get_visitor(var1 date, var2 date)
+RETURNS table
+		(id_visitor int,
+		fullname text)
+AS $$
+DECLARE 
+temp record;
+cur_visitor cursor(var1 date, var2 date) FOR 
+SELECT RESERVATIONS.id_visitor AS visitor, VISITORS.fullname AS name
+FROM RESERVATIONS INNER JOIN VISITORS ON (RESERVATIONS.id_visitor = VISITORS.id_visitor) 
+WHERE from_date BETWEEN var1 AND var2;
+BEGIN 
+OPEN cur_visitor(var1, var2);
+LOOP
+FETCH cur_visitor INTO temp;
+EXIT WHEN NOT FOUND;
+id_visitor:= temp.visitor;
+fullname:= temp.name;
+RETURN NEXT;
+END LOOP;
+CLOSE cur_visitor;
+END; $$
+LANGUAGE plpgsql;
+SELECT * FROM get_visitor('2020-06-01', '2020-06-30');
+

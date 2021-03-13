@@ -1,0 +1,95 @@
+--(a)Πόσες κρατήσεις αντιστοιχούν σε κάθε κατηγορία δωματίων;--
+SELECT COUNT(DISTINCT RESERVATIONS.id_reservation)
+FROM RESERVATIONS INNER JOIN ROOMS ON (RESERVATIONS.id_room = ROOMS.id_room)
+WHERE ROOMS.type = 'single';
+
+SELECT COUNT(DISTINCT RESERVATIONS.id_reservation)
+FROM RESERVATIONS INNER JOIN ROOMS ON (RESERVATIONS.id_room = ROOMS.id_room)
+WHERE ROOMS.type = 'double';
+
+SELECT COUNT(DISTINCT RESERVATIONS.id_reservation)
+FROM RESERVATIONS INNER JOIN ROOMS ON (RESERVATIONS.id_room = ROOMS.id_room)
+WHERE ROOMS.type = 'triple';
+
+SELECT COUNT(DISTINCT RESERVATIONS.id_reservation)
+FROM RESERVATIONS INNER JOIN ROOMS ON (RESERVATIONS.id_room = ROOMS.id_room)
+WHERE ROOMS.type = 'quadruple';
+
+
+--(b)Ποια κατηγορία δωματίων παρουσιάζει βάσει των κρατήσεων τον μεγαλύτερο τζίρο--
+WITH TEMPORARYSUM (type, sum) AS
+(SELECT ROOMS.type, SUM(ROOMS.room_cost) AS sum_cost
+FROM RESERVATIONS INNER JOIN ROOMS ON (RESERVATIONS.id_room = ROOMS.id_room)
+GROUP BY ROOMS.type 
+ORDER BY sum_cost DESC)
+SELECT type FROM TEMPORARYSUM 
+WHERE sum = (SELECT MAX(sum) FROM TEMPORARYSUM);
+
+
+
+
+--(c)Πόσα δωμάτια είναι προς το παρόν διαθέσιμα προς κράτηση--
+SELECT COUNT(id_room)	
+FROM ROOMS 
+WHERE id_room NOT IN 
+(SELECT ROOMS.id_room
+FROM RESERVATIONS INNER JOIN ROOMS ON (RESERVATIONS.id_room = ROOMS.id_room)
+WHERE RESERVATIONS.from_date = '2020-06-01');
+
+
+
+--(d)Ποιες παροχές (facilities) διατίθενται σε συγκεκριμένα δωμάτια--
+SELECT id_room, tv, air_condition, room_service
+FROM ROOMS
+WHERE type = 'single' AND season = 'winter';
+
+
+
+--(e)Ποιοι επισκέπτες έχουν κράτηση αυτό το μήνα--
+SELECT RESERVATIONS.id_visitor, VISITORS.fullname 
+FROM RESERVATIONS INNER JOIN VISITORS ON (RESERVATIONS.id_visitor = VISITORS.id_visitor) 
+WHERE from_date BETWEEN '2020-06-01' AND '2020-06-30';
+
+
+
+--(f)Ποιο είναι το μέσο κέρδος ανά τύπο/κατηγορία δωματίου για τη θερινή σεζόν--
+SELECT AVG(DISTINCT ROOMS.room_cost)
+FROM RESERVATIONS INNER JOIN ROOMS ON (RESERVATIONS.id_room = ROOMS.id_room)
+WHERE ROOMS.season = 'summer' AND ROOMS.type = 'single';
+
+SELECT AVG(DISTINCT ROOMS.room_cost)
+FROM RESERVATIONS INNER JOIN ROOMS ON (RESERVATIONS.id_room = ROOMS.id_room)
+WHERE ROOMS.season = 'summer' AND ROOMS.type = 'double';
+
+SELECT AVG(DISTINCT ROOMS.room_cost)
+FROM RESERVATIONS INNER JOIN ROOMS ON (RESERVATIONS.id_room = ROOMS.id_room)
+WHERE ROOMS.season = 'summer' AND ROOMS.type = 'triple';
+
+SELECT AVG(DISTINCT ROOMS.room_cost)
+FROM RESERVATIONS INNER JOIN ROOMS ON (RESERVATIONS.id_room = ROOMS.id_room)
+WHERE ROOMS.season = 'summer' AND ROOMS.type = 'quadruple';
+
+
+
+
+--(g)Ποιος είναι ο πελάτης με τις περισσότερες κρατήσεις ανά εύρος ζώνης τιμής δωματίου--
+SELECT CUSTOMERS.fullname, COUNT(RESERVATIONS.id_reservation) AS count_r
+FROM RESERVATIONS INNER JOIN ROOMS ON (RESERVATIONS.id_room = ROOMS.id_room) INNER JOIN CUSTOMERS ON (RESERVATIONS.id_customer = CUSTOMERS.id_customer)
+WHERE ROOMS.price_range = 'economy'
+GROUP BY CUSTOMERS.fullname
+ORDER BY count_r DESC LIMIT 1;
+
+SELECT CUSTOMERS.fullname, COUNT(RESERVATIONS.id_reservation) AS count_r
+FROM RESERVATIONS INNER JOIN ROOMS ON (RESERVATIONS.id_room = ROOMS.id_room) INNER JOIN CUSTOMERS ON (RESERVATIONS.id_customer = CUSTOMERS.id_customer)
+WHERE ROOMS.price_range = 'luxury'
+GROUP BY CUSTOMERS.fullname
+ORDER BY count_r DESC LIMIT 1;
+
+
+
+
+
+--(h)Ποια δωμάτια ενοικιάστηκαν από την ημερομηνία “X” έως και σήμερα--
+SELECT RESERVATIONS.id_room 
+FROM RESERVATIONS INNER JOIN ROOMS ON(RESERVATIONS.id_room = ROOMS.id_room)
+WHERE date BETWEEN '2020-01-01' AND '2020-06-30';

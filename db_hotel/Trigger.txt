@@ -1,0 +1,17 @@
+CREATE OR REPLACE FUNCTION false_booking()
+RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+BEGIN
+IF NEW.from_date BETWEEN '2020-06-01' AND '2020-06-30' THEN
+RAISE NOTICE 'FALSE BOOKING';
+UPDATE ROOMS SET price_range='economy', room_cost=room_cost - room_cost*30/100 WHERE price_range='luxury';
+END IF;
+RETURN NEW;
+END;
+$$;
+CREATE TRIGGER false_booking BEFORE INSERT ON RESERVATIONS
+FOR EACH ROW EXECUTE PROCEDURE false_booking();
+INSERT INTO ROOM_RESERVATIONS(id_reservation, id_customer, credit_card, total_cost) VALUES (502, 5, '3535925742740554', 100);
+INSERT INTO RESERVATIONS(id_reservation, id_customer, id_visitor, date, from_date, to_date, status_cost, date_cost, id_room) VALUES(502, 5, 9, '2020-05-05', '2020-06-10', '2020-06-13', true, '2020-05-06', 1);
+SELECT * FROM ROOMS WHERE id_room=1;
